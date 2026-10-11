@@ -9,7 +9,7 @@ CREATE TABLE incidents (
  error_code INTEGER NOT NULL,
  created_at TEXT NOT NULL
 );
-INSERT INTO products VALUES (1,'FileQueue'),(2,'MailGateway'),(3,'AdminConsole');
+INSERT INTO products VALUES (1,'FileQueue'),(2,'MailGateway'),(3,'AdminConsole'),(4,'EmptyService');
 INSERT INTO incidents VALUES
  (1,1,'OPEN','P1',NULL,500,'2026-10-01'),
  (2,1,'IN_PROGRESS','P2','engineer-a',422,'2026-10-02'),
