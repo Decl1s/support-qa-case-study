@@ -40,6 +40,17 @@ class DiagnosticsTest(unittest.TestCase):
             with self.subTest(query=f"Q{number}"):
                 self.assertEqual(expected, self.db.execute(query).fetchall())
 
+    def test_server_error_groups_exclude_singletons_and_client_errors(self):
+        # Existing server errors all repeat; add counterexamples for WHERE and HAVING.
+        self.db.executemany(
+            "INSERT INTO incidents VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [
+                (9, 1, "OPEN", "P2", "engineer-a", 502, "2026-10-01"),
+                (10, 1, "OPEN", "P2", "engineer-a", 404, "2026-10-01"),
+            ],
+        )
+        self.assertEqual([(500, 2), (503, 2)], self.db.execute(self.queries[4]).fetchall())
+
     def test_product_without_incidents_has_zero_active_count(self):
         self.assertEqual(self.expected, self.db.execute(self.query).fetchall())
 
