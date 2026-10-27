@@ -51,6 +51,17 @@ class DiagnosticsTest(unittest.TestCase):
         )
         self.assertEqual([(500, 2), (503, 2)], self.db.execute(self.queries[4]).fetchall())
 
+    def test_unassigned_query_includes_in_progress_but_excludes_closed(self):
+        self.db.executemany(
+            "INSERT INTO incidents VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [
+                (9, 1, "CLOSED", "P2", None, 500, "2026-10-01"),
+                (10, 1, "IN_PROGRESS", "P2", None, 500, "2026-10-01"),
+                (11, 1, "OPEN", "P2", "engineer-a", 500, "2026-10-01"),
+            ],
+        )
+        self.assertEqual([(1,), (5,), (10,)], self.db.execute(self.queries[1]).fetchall())
+
     def test_product_without_incidents_has_zero_active_count(self):
         self.assertEqual(self.expected, self.db.execute(self.query).fetchall())
 
