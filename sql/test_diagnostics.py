@@ -62,6 +62,17 @@ class DiagnosticsTest(unittest.TestCase):
         )
         self.assertEqual([(1,), (5,), (10,)], self.db.execute(self.queries[1]).fetchall())
 
+    def test_empty_incidents_preserve_products_with_zero_counts(self):
+        self.db.execute("DELETE FROM incidents")
+        expected_results = [
+            [], [], [],
+            [("FileQueue", 0), ("MailGateway", 0), ("AdminConsole", 0), ("EmptyService", 0)],
+            [], [],
+        ]
+        for number, (query, expected) in enumerate(zip(self.queries, expected_results), 1):
+            with self.subTest(query=f"Q{number}"):
+                self.assertEqual(expected, self.db.execute(query).fetchall())
+
     def test_product_without_incidents_has_zero_active_count(self):
         self.assertEqual(self.expected, self.db.execute(self.query).fetchall())
 
