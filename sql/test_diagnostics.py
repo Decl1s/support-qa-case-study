@@ -4,6 +4,8 @@ from pathlib import Path
 import sqlite3
 import unittest
 
+from query_loader import load_queries
+
 
 BASE = Path(__file__).resolve().parent
 
@@ -13,12 +15,7 @@ class DiagnosticsTest(unittest.TestCase):
         self.db = sqlite3.connect(":memory:")
         self.addCleanup(self.db.close)
         self.db.executescript((BASE / "schema.sql").read_text(encoding="utf-8"))
-        # Strip full-line comments before splitting: the Q4 comment contains a semicolon.
-        sql = "\n".join(
-            line for line in (BASE / "diagnostics.sql").read_text(encoding="utf-8").splitlines()
-            if not line.lstrip().startswith("--")
-        )
-        queries = [query.strip() for query in sql.split(";") if query.strip()]
+        queries = load_queries(BASE / "diagnostics.sql")
         self.assertEqual(6, len(queries), "The exercise must contain Q1 through Q6")
         self.queries = queries
         self.query = queries[3]

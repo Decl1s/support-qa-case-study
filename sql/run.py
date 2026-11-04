@@ -1,11 +1,12 @@
 from pathlib import Path
 import sqlite3
 
+from query_loader import load_queries
+
+
 base = Path(__file__).resolve().parent
 with sqlite3.connect(":memory:") as db:
-    db.executescript((base / "schema.sql").read_text())
-    sql = "\n".join(line for line in (base / "diagnostics.sql").read_text().splitlines() if not line.lstrip().startswith("--"))
-    for index, query in enumerate(sql.split(";"), 1):
-        if query.strip():
-            rows = db.execute(query).fetchall()
-            print(f"Q{index}: {rows}")
+    db.executescript((base / "schema.sql").read_text(encoding="utf-8"))
+    for index, query in enumerate(load_queries(base / "diagnostics.sql"), 1):
+        rows = db.execute(query).fetchall()
+        print(f"Q{index}: {rows}")
